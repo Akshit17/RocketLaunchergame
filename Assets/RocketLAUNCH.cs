@@ -9,14 +9,21 @@ public class RocketLAUNCH : MonoBehaviour
    
     
     
-    [SerializeField] float mainThrust = 550f;
+    [SerializeField] float mainThrust = 650f;
     [SerializeField] float rotateThrust = 50f;
     new Rigidbody rigidbody;
+    AudioSource thrustaudio;
+
+    enum State { Alive , Dying , Ascending};
+    State state;
+   
     // Start is called before the first frame update
 
     void Start()
     {
         rigidbody = GameObject.Find("Rocket").GetComponent<Rigidbody>();
+        thrustaudio = GetComponent<AudioSource>();
+        state = State.Alive ; 
     }
 
     // Update is called once per frame
@@ -27,11 +34,11 @@ public class RocketLAUNCH : MonoBehaviour
         float rotateThrustframe = rotateThrust * Time.deltaTime;
 
 
-
-
-        Thrust();
-        Rotate();
-
+        if (state == State.Alive)
+        {
+            Thrust();
+            Rotate();
+        }
          
     }
 
@@ -42,17 +49,40 @@ public class RocketLAUNCH : MonoBehaviour
 
         if (Input.GetKey(KeyCode.Space))
         {
+          
             rigidbody.AddRelativeForce(Vector3.up * mainThrustframe);
+
+
+          
+
+
+         if (!thrustaudio.isPlaying)
+            {
+            
+                thrustaudio.Play();
+          
+            }
+
 
         }
 
+        else
+        {
+           Invoke("StoppingSound" , 0.05f);
 
+        }
+    }
+
+    private void StoppingSound()
+    {
+        thrustaudio.Stop();
     }
 
     void Rotate()
     {
 
         float rotateThrustframe = rotateThrust * Time.deltaTime;
+       
         rigidbody.freezeRotation = true;
 
 
@@ -94,13 +124,16 @@ public class RocketLAUNCH : MonoBehaviour
 
             case "Endpoint":
                 {
-                    SceneManager.LoadScene(1);
+                    state = State.Ascending;
+                   Invoke("NextLevelLoad", 0.5f);
                     break;
                 }
-            
+
             default:
-                SceneManager.LoadScene(0);
+                state = State.Dying;
+                Invoke("LoadFirstLevel", 0.5f);
                 break;
+
         };
 
 
@@ -110,42 +143,15 @@ public class RocketLAUNCH : MonoBehaviour
      
         }
 
+   void NextLevelLoad()
+    {
+        SceneManager.LoadScene(1);
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+     void LoadFirstLevel()
+    {
+        SceneManager.LoadScene(0);
+    }
 }
 
 

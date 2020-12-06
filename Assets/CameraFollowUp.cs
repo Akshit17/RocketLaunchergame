@@ -16,6 +16,7 @@ public class CameraFollowUp : MonoBehaviour
 
 
         transform.position = smoothedPosition;
+   
     }
 
 
